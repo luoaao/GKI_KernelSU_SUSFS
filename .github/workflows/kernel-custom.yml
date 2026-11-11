@@ -148,7 +148,6 @@ jobs:
           import os
           import sys
           from pathlib import Path
-
           kernel_version = os.environ["KERNEL_VERSION"]
           os_patch_level = os.environ["OS_PATCH_LEVEL"].strip()
           android_map = {
@@ -162,16 +161,12 @@ jobs:
           if android_version is None:
               print(f"::error::未适配的内核版本: {kernel_version}")
               sys.exit(1)
-
           data_path = Path("data") / android_version / f"{kernel_version}.json"
-
           if not data_path.exists():
               print(f"::error::未找到版本数据: {data_path}")
               sys.exit(1)
-
           with data_path.open("r", encoding="utf-8") as f:
               data = json.load(f)
-
           if os_patch_level == "lts":
               kernel_full = data.get("lts")
               if not kernel_full:
@@ -192,15 +187,12 @@ jobs:
                   print(f"::error::版本数据异常: {kernel_full} 不属于 {kernel_version}")
                   sys.exit(1)
               sub_level = kernel_full.rsplit(".", 1)[-1]
-
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"android_version={android_version}\n")
               output.write(f"sub_level={sub_level}\n")
               output.write(f"kernel_full={kernel_full}\n")
-
           print(f"解析结果: {android_version} / {kernel_full}，子版本号: {sub_level}")
           PY
-
   build-custom-kernel:
     name: "${{ needs.resolve-version.outputs.kernel_full }}-${{ needs.resolve-version.outputs.android_version }}-${{ inputs.os_patch_level }}"
     needs: resolve-version
