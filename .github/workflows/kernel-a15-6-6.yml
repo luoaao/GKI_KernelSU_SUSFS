@@ -1,4 +1,4 @@
-name: 内核构建‑A15‑6.6.118 原厂版本号｜禁用KSU｜678槽Droidspaces
+name: 内核构建‑A15‑6.6.118 原厂版本号
 permissions:
   contents: write
   actions: write
