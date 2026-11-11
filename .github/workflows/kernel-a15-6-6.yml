@@ -1,4 +1,4 @@
-name: 内核构建 - Android15 6.6.118 Only(Droidspaces完整版)
+name: 内核构建‑A15‑6.6.118 原厂版本号｜禁用KSU｜678槽Droidspaces
 permissions:
   contents: write
   actions: write
@@ -6,9 +6,8 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      # ==================== 下拉选项 ====================
       kernelsu_variant:
-        description: "KernelSU 变体【Droidspaces推荐 BakaSU】"
+        description: "KernelSU变体(ksu_mode=禁用KSU，此项会被忽略)"
         required: true
         type: choice
         options:
@@ -20,17 +19,17 @@ on:
         default: BakaSU
 
       ksu_mode:
-        description: "KernelSU / SUSFS 模式｜关闭=开启SUSFS；禁用SUSFS=关闭SUSFS；禁用KSU=不带Root"
+        description: "KernelSU模式｜选【禁用KSU】，不编译任何KSU代码"
         required: true
         type: choice
         options:
           - 关闭
           - 禁用SUSFS
           - 禁用KSU
-        default: 关闭
+        default: 禁用KSU
 
       use_kpm:
-        description: "KPM模块｜Droidspaces不要开启"
+        description: "KPM功能｜关闭"
         required: true
         type: choice
         default: "disabled (关闭)"
@@ -40,7 +39,7 @@ on:
           - "patched (开启并修补，尚不支持)"
 
       droidspaces:
-        description: "Droidspaces GKI槽位补丁【核心！678优先，卡logo换123，再不行345】off=关闭容器支持"
+        description: "Droidspaces槽位｜这里只能678，本仓库没有stock原槽补丁"
         required: false
         type: choice
         options:
@@ -51,7 +50,7 @@ on:
         default: "678"
 
       artifact_upload_mode:
-        description: "构建产物上传模式｜刷入选仅上传AnyKernel3.zip"
+        description: "构建产物上传模式"
         required: true
         type: choice
         options:
@@ -59,64 +58,62 @@ on:
           - "上传全部"
         default: "仅上传 AnyKernel3.zip"
 
-      # ==================== 文本输入 ====================
       version:
-        description: "自定义版本名 (可选，例如 Mi15P‑DS‑6.6.118)"
+        description: "【重点】原样粘贴原厂内核版本串，不要修改"
         required: false
         type: string
-        default: "Mi15P‑DS‑6.6.118"
+        default: "6.6.118-android15-8-gb9cc6ec16bc-abogki536571621-4k"
 
       build_time:
-        description: "自定义构建时间 (N或留空=当前UTC)"
+        description: "自定义构建时间(N=当前UTC)"
         required: false
         type: string
         default: "N"
 
-      # ==================== 开关选项 ====================
       use_zram:
-        description: "ZRAM增强算法｜不需要关闭"
+        description: "启用ZRAM增强算法"
         required: true
         type: boolean
         default: false
 
       use_bbg:
-        description: "BBG防格机｜小米设备关闭"
+        description: "启用BBG防格机"
         required: true
         type: boolean
         default: false
 
       use_rekernel:
-        description: "Re‑Kernel驱动｜Droidspaces不需要"
+        description: "启用Re‑Kernel驱动"
         required: false
         type: boolean
         default: false
 
       use_nomount:
-        description: "NoMount挂载元模块｜关闭"
+        description: "启用NoMount挂载元模块"
         required: false
         type: boolean
         default: false
 
       use_networking:
-        description: "网络增强【Droidspaces NAT网络必须打开，ipset/nftables】"
+        description: "网络增强(BBRv3/IPSet，Droidspaces需要打开)"
         required: false
         type: boolean
         default: true
 
       cve_2026_43499_patch:
-        description: "CVE rtmutex修复链｜可选关闭"
+        description: "CVE‑2026‑43499 rtmutex修复链"
         required: false
         type: boolean
         default: false
 
       supp_op:
-        description: "一加8E兼容补丁｜小米设备关闭"
+        description: "一加8E支持"
         required: false
         type: boolean
         default: false
 
       droidspaces_ntsync:
-        description: "Droidspaces NTSync容器时间同步【必须打开】"
+        description: "Droidspaces NTSync容器时间同步"
         required: false
         type: boolean
         default: true
@@ -161,7 +158,7 @@ on:
       ksu_mode:
         required: false
         type: string
-        default: 关闭
+        default: 禁用KSU
       supp_op:
         required: false
         type: boolean
@@ -190,12 +187,11 @@ on:
 
 jobs:
   build-kernels-a15-6-6:
-    name: "6.6.118-android15‑2026‑01‑Droidspaces"
+    name: "6.6.118 原厂版本号｜禁用KSU｜678槽 Droidspaces"
     strategy:
       fail-fast: false
       matrix:
         include:
-          # 只保留 6.6.118，不再编译其他版本
           - sub_level: "118"
             os_patch_level: "2026-01"
     uses: ./.github/workflows/build.yml
@@ -218,7 +214,7 @@ jobs:
       export_susfs_patches: ${{ inputs.export_susfs_patches || false }}
       supp_op: ${{ inputs.supp_op || false }}
       enable_susfs: ${{ inputs.ksu_mode != '禁用SUSFS' && inputs.ksu_mode != '禁用KSU' }}
-      ksu_mode: ${{ inputs.ksu_mode || '关闭' }}
+      ksu_mode: ${{ inputs.ksu_mode || '禁用KSU' }}
       droidspaces: ${{ inputs.droidspaces || '678' }}
       droidspaces_ntsync: ${{ inputs.droidspaces_ntsync || false }}
       artifact_upload_mode: ${{ inputs.artifact_upload_mode }}
